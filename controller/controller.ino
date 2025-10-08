@@ -1,10 +1,4 @@
 //==============================================================================
-//                              INCLUDES 
-//==============================================================================
-#include "LiquidCrystal_I2C.h"
-#include "Wire.h"
-
-//==============================================================================
 //                               CONFIG 
 //==============================================================================
 #define PIN_ENA_IN 7
@@ -20,10 +14,6 @@
 #define POTENTIOMETER_MIDDLE 512
 #define IMPULSE_DELAY_MICRO 250
 
-#define LCD_ADDRESS 0x27
-#define COLUMN_COUNT 20
-#define ROW_COUNT 2
-#define LCD_REFRESH_PERIOD 250
 
 typedef unsigned long time_ms;
 
