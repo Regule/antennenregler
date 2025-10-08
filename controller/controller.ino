@@ -1,4 +1,4 @@
- //==============================================================================
+//==============================================================================
 //                              INCLUDES 
 //==============================================================================
 #include "LiquidCrystal_I2C.h"
@@ -96,31 +96,6 @@ void spin_stepper(){
     
 }
 
-//==============================================================================
-//                              LCD                               
-//==============================================================================
-LiquidCrystal_I2C lcd(LCD_ADDRESS, COLUMN_COUNT, ROW_COUNT);
-time_ms lcd_timestamp{0};
-
-void init_lcd(){
-    lcd.init();
-    lcd.backlight();
-}
-
-void spin_lcd(){
-    if(millis() - lcd_timestamp < LCD_REFRESH_PERIOD){
-        return;
-    }
-
-    lcd.setCursor(0,0);
-    lcd.print(period, DEC);
-    lcd.print(" ");
-    lcd.print(last_impulse);
-    lcd.setCursor(0,1);
-    lcd.print(reverse?"REV":"FWD");
-    lcd.print(" ");
-    lcd.print(enabled?"ENA":"DIS");
-}
 
 //==============================================================================
 //                              MAIN 
@@ -128,11 +103,9 @@ void spin_lcd(){
 
 void setup(){
     init_stepper();
-    init_lcd();
 }
 
 void loop(){
     update_stepper();
     spin_stepper();
-    //spin_lcd();
 }

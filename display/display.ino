@@ -1,58 +1,88 @@
+//==============================================================================
+//                              INCLUDES 
+//==============================================================================
 #include "LiquidCrystal_I2C.h"
 #include "Wire.h"
 
+//==============================================================================
+//                               CONFIG 
+//==============================================================================
+
+// LCD
 #define LCD_ADDRESS 0x27
 #define COLUMN_COUNT 20
 #define ROW_COUNT 2
 
+// Buttons and potentiometers
+#define PIN_POTENTIOMETER_CONTROL A0
+#define PIN_POTENTIOMETER_ENCODER A1
+#define PIN_BUTTON_MINUS 4
+#define PIN_BUTTON_X 5
+#define PIN_BUTTON_PLUS 6
+#define PIN_BUTTON_C 7
+
+// Connection to controller board
+#define PIN_CONTROLLER_ENABLE 8 
+
+
+
+//==============================================================================
+//                              GLOBALS 
+//==============================================================================
 LiquidCrystal_I2C lcd(LCD_ADDRESS, COLUMN_COUNT, ROW_COUNT);
 
-int pot1 = 0;
-int pot2 = 0;
-int inPin4 = 4;
-int inPin5 = 5;
-int inPin6 = 6;
-int inPin7 = 7;
-int outPin8 = 8;
-
-int inPin7State = HIGH;
+int button_c_state = HIGH;
 bool enabled = false;
+int potentiometer_control = 0;
+int potentiometer_encoder = 0;
 
+
+
+
+//==============================================================================
+//                             SETUP-LOOP 
+//==============================================================================
 void setup()
 {
     lcd.init();
     lcd.backlight();
-    pinMode(pot1, INPUT); 
-    pinMode(pot2, INPUT); 
-    pinMode(inPin4, INPUT); 
-    pinMode(inPin5, INPUT); 
-    pinMode(inPin6, INPUT); 
-    pinMode(inPin7, INPUT); 
-    pinMode(outPin8, OUTPUT); 
-    digitalWrite(outPin8, LOW);
+
+    // Setting up potentiometers
+    pinMode(PIN_POTENTIOMETER_CONTROL , INPUT); 
+    pinMode(PIN_POTENTIOMETER_ENCODER, INPUT); 
+
+    // Setting up buttons
+    pinMode(PIN_BUTTON_MINUS, INPUT); 
+    pinMode(PIN_BUTTON_X, INPUT); 
+    pinMode(PIN_BUTTON_PLUS , INPUT); 
+    pinMode(PIN_BUTTON_C , INPUT); 
+
+    // Setting up connections to controller
+    pinMode(PIN_CONTROLLER_ENABLE, OUTPUT); 
+    digitalWrite(PIN_CONTROLLER_ENABLE, LOW);
 }
 
 void loop()
 {
-    if(inPin7State == HIGH && digitalRead(inPin7) == LOW){
+    if(button_c_state == HIGH && digitalRead(PIN_BUTTON_C) == LOW){
         enabled = !enabled;
-        inPin7State = LOW;
-    }else if(inPin7State == LOW && digitalRead(inPin7) == HIGH){
-        inPin7State = HIGH;
+        button_c_state = LOW;
+    }else if(button_c_state == LOW && digitalRead(PIN_BUTTON_C) == HIGH){
+        button_c_state = HIGH;
     }
     if(enabled){
-        digitalWrite(outPin8,HIGH);
+        digitalWrite(PIN_CONTROLLER_ENABLE,HIGH);
     }else{
-        digitalWrite(outPin8,LOW);
+        digitalWrite(PIN_CONTROLLER_ENABLE,LOW);
     }
-    pot1 = analogRead(A0);
-    pot2 = analogRead(A1);
+    potentiometer_control = analogRead(PIN_POTENTIOMETER_CONTROL);
+    potentiometer_encoder = analogRead(PIN_POTENTIOMETER_ENCODER);
 
-    int potentiometer = pot1 - 512;
-     if(potentiometer < 0){
-       potentiometer *= -1;
+    int control_value = potentiometer_control - 512;
+     if(control_value < 0){
+       control_value *= -1;
      }
-     int period = map(potentiometer,
+     int period = map(control_value,
                 0, 512,
                 2, 50);
     
@@ -61,14 +91,14 @@ void loop()
     
     lcd.setCursor(0,0);
     lcd.print("P1=");
-    lcd.print(pot1);
+    lcd.print(potentiometer_control);
     lcd.print(" T=");
     lcd.print(period);
     lcd.setCursor(0,1);
     lcd.print("STATE=");
     lcd.print(enabled?"ENA ":"DIS ");
     lcd.print(" C=");
-    if(digitalRead(inPin7)==HIGH){lcd.print("1");}else{lcd.print("0");}    
+    if(digitalRead(PIN_BUTTON_C)==HIGH){lcd.print("1");}else{lcd.print("0");}    
     
     delay(200);
 
