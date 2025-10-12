@@ -16,10 +16,6 @@
 // Buttons and potentiometers
 #define PIN_POTENTIOMETER_CONTROL A0
 #define PIN_POTENTIOMETER_ENCODER A1
-#define PIN_BUTTON_MINUS 4
-#define PIN_BUTTON_X 5
-#define PIN_BUTTON_PLUS 6
-#define PIN_BUTTON_C 7
 
 // Connection to controller board
 #define PIN_CONTROLLER_ENABLE 8 
@@ -51,30 +47,12 @@ void setup()
     pinMode(PIN_POTENTIOMETER_CONTROL , INPUT); 
     pinMode(PIN_POTENTIOMETER_ENCODER, INPUT); 
 
-    // Setting up buttons
-    pinMode(PIN_BUTTON_MINUS, INPUT); 
-    pinMode(PIN_BUTTON_X, INPUT); 
-    pinMode(PIN_BUTTON_PLUS , INPUT); 
-    pinMode(PIN_BUTTON_C , INPUT); 
-
     // Setting up connections to controller
-    pinMode(PIN_CONTROLLER_ENABLE, OUTPUT); 
-    digitalWrite(PIN_CONTROLLER_ENABLE, LOW);
+    pinMode(PIN_CONTROLLER_ENABLE, INPUT); 
 }
 
 void loop()
 {
-    if(button_c_state == HIGH && digitalRead(PIN_BUTTON_C) == LOW){
-        enabled = !enabled;
-        button_c_state = LOW;
-    }else if(button_c_state == LOW && digitalRead(PIN_BUTTON_C) == HIGH){
-        button_c_state = HIGH;
-    }
-    if(enabled){
-        digitalWrite(PIN_CONTROLLER_ENABLE,HIGH);
-    }else{
-        digitalWrite(PIN_CONTROLLER_ENABLE,LOW);
-    }
     potentiometer_control = analogRead(PIN_POTENTIOMETER_CONTROL);
     potentiometer_encoder = analogRead(PIN_POTENTIOMETER_ENCODER);
 
@@ -85,7 +63,8 @@ void loop()
      int period = map(control_value,
                 0, 512,
                 2, 50);
-    
+
+    enabled = digitalRead(PIN_CONTROLLER_ENABLE) == HIGH;
 
     lcd.clear();
     
@@ -97,11 +76,8 @@ void loop()
     lcd.setCursor(0,1);
     lcd.print("STATE=");
     lcd.print(enabled?"ENA ":"DIS ");
-    lcd.print(" C=");
-    if(digitalRead(PIN_BUTTON_C)==HIGH){lcd.print("1");}else{lcd.print("0");}    
     
     delay(200);
-
      
 }
      
