@@ -18,10 +18,10 @@
 #define IMPULSE_DELAY_MICRO 250
 
 // Front panel buttons
-#define PIN_BUTTON_MINUS 4
-#define PIN_BUTTON_X 5
-#define PIN_BUTTON_PLUS 6
-#define PIN_BUTTON_C 7
+#define PIN_BUTTON_MINUS 6
+#define PIN_BUTTON_X 4
+#define PIN_BUTTON_PLUS 5
+#define PIN_BUTTON_C 3
 #define PIN_CONTROLLER_ENABLE 7 
 typedef unsigned long time_ms;
 
@@ -44,16 +44,6 @@ void init_stepper(){
     pinMode(PIN_DIR_POTENTIOMETER, INPUT);
 }
 
-void enable_stepper(){
-    digitalWrite(PIN_ENA, HIGH);
-    enabled = true;
-}
-
-void disable_stepper(){
-    digitalWrite(PIN_ENA, LOW);
-    enabled = false;
-}
-
 void update_stepper(){
    int potentiometer = analogRead(PIN_DIR_POTENTIOMETER) - POTENTIOMETER_MIDDLE;
    if(potentiometer < 0){
@@ -68,9 +58,12 @@ void update_stepper(){
        potentiometer = 0;
    }
    if(potentiometer == 0){
-       disable_stepper();
-       return;
+      digitalWrite(PIN_ENA, LOW);
+      return;
+   }else if(enabled){
+     digitalWrite(PIN_ENA, HIGH);
    }
+
    period = map(potentiometer,
                 POTENTIOMETER_MIN, POTENTIOMETER_MIDDLE,
                 PERIOD_MAX, PERIOD_MIN); 
@@ -103,8 +96,10 @@ void handle_buttons(){
     }
     if(enabled){
         digitalWrite(PIN_CONTROLLER_ENABLE,HIGH);
+        digitalWrite(PIN_ENA, HIGH);
     }else{
         digitalWrite(PIN_CONTROLLER_ENABLE,LOW);
+        digitalWrite(PIN_ENA, LOW);
     }
 }
 
@@ -129,4 +124,5 @@ void setup(){
 void loop(){
     update_stepper();
     spin_stepper();
+    handle_buttons();
 }
