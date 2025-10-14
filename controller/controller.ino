@@ -49,20 +49,18 @@ void update_stepper(){
    if(potentiometer < 0){
        potentiometer *= -1;
        reverse = true;
-       digitalWrite(PIN_DIR, HIGH);
    }else{
        reverse = false;
-       digitalWrite(PIN_DIR, LOW);
    }
    if(potentiometer < DEADZONE){
        potentiometer = 0;
    }
-   if(potentiometer == 0){
+   if(!enabled || potentiometer == 0){
       digitalWrite(PIN_ENA, LOW);
       return;
-   }else if(enabled){
-     digitalWrite(PIN_ENA, HIGH);
    }
+   digitalWrite(PIN_ENA, HIGH);
+   digitalWrite(PIN_DIR, reverse?HIGH:LOW);
 
    period = map(potentiometer,
                 POTENTIOMETER_MIN, POTENTIOMETER_MIDDLE,
@@ -76,7 +74,7 @@ void spin_stepper(){
         return;
     }
     digitalWrite(PIN_CLK, HIGH);
-   // delayMicroseconds(IMPULSE_DELAY_MICRO);
+    delayMicroseconds(IMPULSE_DELAY_MICRO);
     digitalWrite(PIN_CLK, LOW);
     last_impulse = millis();  
   }
@@ -96,10 +94,8 @@ void handle_buttons(){
     }
     if(enabled){
         digitalWrite(PIN_CONTROLLER_ENABLE,HIGH);
-        digitalWrite(PIN_ENA, HIGH);
     }else{
         digitalWrite(PIN_CONTROLLER_ENABLE,LOW);
-        digitalWrite(PIN_ENA, LOW);
     }
 }
 
