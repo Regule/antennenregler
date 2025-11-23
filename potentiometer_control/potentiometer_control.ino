@@ -29,7 +29,7 @@ void update_stepper(){
                 POTENTIOMETER_MIN, POTENTIOMETER_MIDDLE,
                 SPEED_MIN, SPEED_MAX); 
    if(reverse){
-      potentiometer = -1*potentiometer;
+      speed = -1*speed;
    }
    stepper.setSpeed(speed);
 }
